@@ -2,7 +2,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+
   },
   "homepage": "https://miluku1018.github.io/fe-assigments",
   "dependencies": {
