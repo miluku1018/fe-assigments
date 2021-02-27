@@ -90,6 +90,12 @@ function AniSearch() {
   const [searchText, setSearchText] = useState("");
   const [value, setValue] = useState("");
   
+  React.useEffect(() => {
+    console.log(value)
+    console.log(searchText)
+  }, [value, searchText]);
+
+
   const handleSelectChange = (event) => {
     console.log("Select",event.target.value);
     if (event.target.value === "1") {
@@ -109,13 +115,13 @@ function AniSearch() {
     console.log(value === "2")
     if (value === "1") {
       getCharacter({ variables: { search: searchText }})
-      console.log(characterResult)
+      console.log("11")
     } else if (value === "2"){
       getStaff({ variables: { search: searchText }})
-      console.log(staffResult)
+      console.log("22")
     }else {
       getCharacter({ variables: { search: searchText }})
-      console.log(characterResult)
+      console.log("33")
     }
   }
  
