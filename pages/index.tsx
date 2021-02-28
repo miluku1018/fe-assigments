@@ -8,9 +8,9 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { useState } from "react";
 
 
@@ -78,6 +78,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundPosition: "left",
     height: "150px",
     margin: "10px"
+  },
+  circular: {
+    display: "block",
+    marginTop: "15px",
   }
  
 }));
@@ -89,19 +93,13 @@ function AniSearch() {
   const [getStaff, staffResult] = useLazyQuery(STAFF_QUERY);
   const [searchText, setSearchText] = useState("");
   const [value, setValue] = useState("");
-  
-  React.useEffect(() => {
-    console.log(value)
-    console.log(searchText)
-  }, [value, searchText]);
-
 
   const handleSelectChange = (event) => {
-    console.log("Select",event.target.value);
+    let variables = {variables: { search: searchText }}
     if (event.target.value === "1") {
-      getCharacter({ variables: { search: searchText }})
+      getCharacter(variables)
     } else if (event.target.value === "2"){
-      getStaff({ variables: { search: searchText }})
+      getStaff(variables)
     }
     setValue(event.target.value)
   };
@@ -111,20 +109,22 @@ function AniSearch() {
   };
 
   const searchAni = () => {
-    console.log(value === "1")
-    console.log(value === "2")
+    let variables = {variables: { search: searchText }}
     if (value === "1") {
-      getCharacter({ variables: { search: searchText }})
-      console.log("11")
+      getCharacter(variables)
+      getStaff()
     } else if (value === "2"){
-      getStaff({ variables: { search: searchText }})
-      console.log("22")
-    }else {
-      getCharacter({ variables: { search: searchText }})
-      console.log("33")
+      getStaff(variables)
+      getCharacter()
     }
+    setValue("")
+    setSearchText("")
   }
- 
+
+  if (characterResult.loading || staffResult.loading) {
+    return <CircularProgress className={classes.circular}/>
+  }
+
   return (
   <Container component="form" className={classes.root}>
     <FormControl className={classes.formControl}>
@@ -136,8 +136,8 @@ function AniSearch() {
           value={value}
         >
         <option aria-label="None" value="" />
-        <option value={1}>Character</option>
-        <option value={2}>Staff</option>
+        <option value="1">Character</option>
+        <option value="2">Staff</option>
       </Select>
     </FormControl>
     <TextField
@@ -155,7 +155,7 @@ function AniSearch() {
     >
       Search
     </Button>
-    {characterResult.data && characterResult.data.Character &&
+    {characterResult.data? (
     <Card>
        <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
@@ -167,9 +167,7 @@ function AniSearch() {
           image={characterResult.data.Character.image.medium}
           title="image"
         />
-      </Card>
-    }
-    {staffResult.data && staffResult.data.Staff &&
+      </Card>): staffResult.data? (
     <Card>
        <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
@@ -181,8 +179,9 @@ function AniSearch() {
           image={staffResult.data.Staff.image.medium}
           title="image"
         />
-      </Card>
+      </Card>): null
     }
+    
   </Container>);
 }
 
